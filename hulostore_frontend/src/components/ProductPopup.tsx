@@ -2,6 +2,7 @@ import { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function classNames(...classes: string[]) {
   return classes.filter(Boolean).join(" ");
 }
@@ -24,6 +25,30 @@ export default function ProductPopup({ product, open, onClose }: PopupProps) {
   if (!product) {
     return null;
   }
+
+  const addToLocalStorage = () => {
+    if (product) {
+      // Retrieve the current cart from local storage
+      const existingCart = localStorage.getItem("cart");
+      const cart = existingCart ? JSON.parse(existingCart) : [];
+
+      // Check if the product with the same ID is in the cart
+      const existingProductIndex = cart.findIndex(
+        (item: Product) => item.id === product.id
+      );
+
+      if (existingProductIndex !== -1) {
+        // If the product already exists, increment its quantity
+        cart[existingProductIndex].quantity += 1;
+      } else {
+        // If the product doesn't exist, add it to the cart with a quantity of 1
+        cart.push({ ...product, quantity: 1 });
+      }
+
+      // Store the updated cart in local storage
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+  };
 
   return (
     <Transition.Root show={open} as={Fragment}>
@@ -77,6 +102,7 @@ export default function ProductPopup({ product, open, onClose }: PopupProps) {
                       <p className="text-2xl text-gray-900">${product.price}</p>
                       <button
                         type="button"
+                        onClick={addToLocalStorage}
                         className="mt-6 flex w-full items-center justify-center rounded-md border border-transparent bg-indigo-600 px-8 py-3 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
                       >
                         Add to bag

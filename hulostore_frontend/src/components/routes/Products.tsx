@@ -45,6 +45,7 @@ function Products() {
             <a key={p.id} className="group" onClick={() => openPopup(p)}>
               <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-lg bg-gray-200 xl:aspect-h-8 xl:aspect-w-7">
                 <img
+                  id="product-img"
                   src="/ruslan-bardash-4kTbAMRAHtQ-unsplash.jpg"
                   className="h-full w-full object-cover object-center group-hover:opacity-75"
                 />
