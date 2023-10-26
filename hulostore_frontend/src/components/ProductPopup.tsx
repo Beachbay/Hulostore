@@ -11,8 +11,7 @@ type Product = {
   id: number;
   title: string;
   price: number;
-  imageSrc: string;
-  imageAlt: string;
+  description: string;
 };
 
 type PopupProps = {
@@ -91,7 +90,6 @@ export default function ProductPopup({ product, open, onClose }: PopupProps) {
                     <div className="aspect-h-3 aspect-w-2 overflow-hidden rounded-lg bg-gray-100 sm:col-span-4 lg:col-span-5">
                       <img
                         src="/ruslan-bardash-4kTbAMRAHtQ-unsplash.jpg"
-                        alt={product.imageAlt}
                         className="object-cover object-center h-full w-full"
                       />
                     </div>
@@ -100,6 +98,9 @@ export default function ProductPopup({ product, open, onClose }: PopupProps) {
                         {product.title}
                       </h2>
                       <p className="text-2xl text-gray-900">${product.price}</p>
+                      <p className="text-sm text-gray-600 mt-2">
+                        {product.description}
+                      </p>
                       <button
                         type="button"
                         onClick={addToLocalStorage}

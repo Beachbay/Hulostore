@@ -2,88 +2,95 @@ import { useEffect, useState } from "react";
 import CartCard from "../CartCard";
 import Checkout from "../Chekout";
 
-interface Product {
+interface CartItem {
   id: number;
   title: string;
   price: number;
+  quantity: number;
 }
 
-interface CartItem {
-  product: Product;
-  quantity: number;
+interface CheckoutProps {
+  totalPrice: number;
 }
 
 function Cart() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
     if (storedCart) {
-      try {
-        // Parse the stored data and make sure it's an array
-        const parsedCart: CartItem[] = JSON.parse(storedCart);
-
-        if (Array.isArray(parsedCart)) {
-          setCartItems(parsedCart);
-        }
-      } catch (error) {
-        console.error("Error parsing cart data from local storage:", error);
-      }
+      const parsedCart: CartItem[] = JSON.parse(storedCart);
+      setCartItems(parsedCart);
     }
   }, []);
 
-  const removeItem = (product: Product) => {
-    const updatedCartItems = cartItems.filter(
-      (item) => item.product.id !== product.id
-    );
+  useEffect(() => {
+    const price = cartItems.reduce((total, item) => {
+      return total + item.price * item.quantity;
+    }, 0);
 
+    setTotalPrice(price);
+  }, [cartItems]);
+
+  console.log(totalPrice);
+  const saveCartToLocalStorage = (updatedCartItems: CartItem[]) => {
     localStorage.setItem("cart", JSON.stringify(updatedCartItems));
+  };
+
+  const removeItem = (product: CartItem) => {
+    const updatedCartItems = cartItems.filter((item) => item.id !== product.id);
+    saveCartToLocalStorage(updatedCartItems);
     setCartItems(updatedCartItems);
   };
 
-  const increaseItem = (product: Product) => {
+  const increaseItem = (product: CartItem) => {
     const updatedCartItems = [...cartItems];
     const itemIndex = updatedCartItems.findIndex(
-      (item) => item.product.id === product.id
+      (item) => item.id === product.id
     );
 
     if (itemIndex !== -1) {
       updatedCartItems[itemIndex].quantity++;
-      localStorage.setItem("cart", JSON.stringify(updatedCartItems));
+      saveCartToLocalStorage(updatedCartItems);
       setCartItems(updatedCartItems);
     }
   };
 
-  const decreaseItem = (product: Product) => {
+  const decreaseItem = (product: CartItem) => {
     const updatedCartItems = [...cartItems];
     const itemIndex = updatedCartItems.findIndex(
-      (item) => item.product.id === product.id
+      (item) => item.id === product.id
     );
 
     if (itemIndex !== -1 && updatedCartItems[itemIndex].quantity > 1) {
       updatedCartItems[itemIndex].quantity--;
-      localStorage.setItem("cart", JSON.stringify(updatedCartItems));
+      saveCartToLocalStorage(updatedCartItems);
       setCartItems(updatedCartItems);
     }
   };
 
   return (
-    <div className="cart-container">
+    <div className="cart-container bg-[#FCF5ED] text-[#1F1717]">
       <div className="cart-items">
-        {cartItems.map((item) => (
-          <CartCard
-            key={item.product.id}
-            name={item.product.title}
-            price={Math.floor(item.product.price * item.quantity)}
-            quantity={item.quantity}
-            removeItem={() => removeItem(item.product)}
-            increaseItem={() => increaseItem(item.product)}
-            decreaseItem={() => decreaseItem(item.product)}
-          />
-        ))}
+        {cartItems.map((item) => {
+          const { id, title, price } = item;
+          return (
+            <CartCard
+              key={id}
+              name={title}
+              quantity={item.quantity}
+              price={Math.floor(price * item.quantity)}
+              removeItem={() => removeItem(item)}
+              increaseItem={() => increaseItem(item)}
+              decreaseItem={() => decreaseItem(item)}
+            />
+          );
+        })}
       </div>
+
       <div className="checkout-container">
-        <Checkout />
+        <Checkout totalPrice={Math.floor(totalPrice)} />
       </div>
     </div>
   );

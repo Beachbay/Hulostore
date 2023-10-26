@@ -14,7 +14,11 @@ function CartCard(item: CartItem) {
   return (
     <div className="cart-card">
       <div className="left">
-        <img id="cartCard-img" alt="Product Image" />
+        <img
+          id="cartCard-img"
+          src="/ruslan-bardash-4kTbAMRAHtQ-unsplash.jpg"
+          alt="Product Image"
+        />
         <h3 className="product-name">{item.name}</h3>
       </div>
       <div className="count">
